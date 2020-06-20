@@ -55,23 +55,21 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
         for (int i = path.size() - 1; i >= 0; i--) {
             AVLTreeNode<E> A = (AVLTreeNode<E>) (path.get(i));
             updateHeight(A);
-            AVLTreeNode<E> parentOfA = (A == root) ? null :
-                    (AVLTreeNode<E>) (path.get(i - 1));
 
             switch (balanceFactor(A)) {
                 case -2 -> {
                     if (balanceFactor((AVLTreeNode<E>) A.left) <= 0) {
-                        balanceLL(A, parentOfA); // Perform LL rotation
+                        balanceLL(A); // Perform LL rotation
                     } else {
-                        balanceLR(A, parentOfA); // Perform LR rotation
+                        balanceLR(A); // Perform LR rotation
                     }
                     return;
                 }
                 case +2 -> {
                     if (balanceFactor((AVLTreeNode<E>) A.right) >= 0) {
-                        balanceRR(A, parentOfA); // Perform RR rotation
+                        balanceRR(A); // Perform RR rotation
                     } else {
-                        balanceRL(A, parentOfA); // Perform RL rotation
+                        balanceRL(A); // Perform RL rotation
                     }
                     return;
                 }
@@ -95,46 +93,54 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
     /**
      * Balance LL (see Figure 26.3)
      */
-    private void balanceLL(TreeNode<E> A, TreeNode<E> parentOfA) {
+    private void balanceLL(TreeNode<E> A) {
         TreeNode<E> B = A.left; // A is left-heavy and B is left−heavy
 
-        if (A == root) {
-            root = B;
-        } else {
-            if (parentOfA.left == A) {
-                parentOfA.left = B;
-            } else {
-                parentOfA.right = B;
-            }
-        }
+        commonForLeafHeavy(A, B);
 
         A.left = B.right; // Make T2 the left subtree of A
+        if (A.left != null)
+            A.left.parent = A;
         B.right = A; // Make A the left child of B
+        A.parent = B;
         updateHeight((AVLTreeNode<E>) A);
         updateHeight((AVLTreeNode<E>) B);
+    }
+
+    private void commonForLeafHeavy(TreeNode<E> A, TreeNode<E> B) {
+        if (A == root) {
+            root = B;
+            B.parent = null;
+        } else {
+            if (A.parent.left == A) {
+                A.parent.left = B;
+            } else {
+                A.parent.right = B;
+            }
+            B.parent = A.parent;
+        }
     }
 
     /**
      * Balance LR (see Figure 26.5)
      */
-    private void balanceLR(TreeNode<E> A, TreeNode<E> parentOfA) {
+    private void balanceLR(TreeNode<E> A) {
         TreeNode<E> B = A.left; // A is left−heavy
         TreeNode<E> C = B.right; // B is right−heavy
 
-        if (A == root) {
-            root = C;
-        } else {
-            if (parentOfA.left == A) {
-                parentOfA.left = C;
-            } else {
-                parentOfA.right = C;
-            }
-        }
+        rotateOfTriade(A, C);
+
 
         A.left = C.right; // Make T3 the left subtree of A
+        if (A.left != null)
+            A.left.parent = A;
         B.right = C.left; // Make T2 the right subtree of B
+        if (B.right != null)
+            B.right.parent = B;
         C.left = B;
+        B.parent = C;
         C.right = A;
+        A.parent = C;
 
         // Adjust heights
         updateHeight((AVLTreeNode<E>) A);
@@ -142,24 +148,33 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
         updateHeight((AVLTreeNode<E>) C);
     }
 
+    private void rotateOfTriade(TreeNode<E> A, TreeNode<E> C) {
+        if (A == root) {
+            root = C;
+            C.parent = null;
+        } else {
+            if (A.parent.left == A) {
+                A.parent.left = C;
+            } else {
+                A.parent.right = C;
+            }
+            C.parent = A.parent;
+        }
+    }
+
     /**
      * Balance RR (see Figure 26.4)
      */
-    private void balanceRR(TreeNode<E> A, TreeNode<E> parentOfA) {
+    private void balanceRR(TreeNode<E> A) {
         TreeNode<E> B = A.right; // A is right-heavy and B is right-heavy
 
-        if (A == root) {
-            root = B;
-        } else {
-            if (parentOfA.left == A) {
-                parentOfA.left = B;
-            } else {
-                parentOfA.right = B;
-            }
-        }
+        commonForLeafHeavy(A, B);
 
         A.right = B.left; // Make T2 the right subtree of A
+        if (A.right != null)
+            A.right.parent = A;
         B.left = A;
+        A.parent = B;
         updateHeight((AVLTreeNode<E>) A);
         updateHeight((AVLTreeNode<E>) B);
     }
@@ -167,24 +182,22 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
     /**
      * Balance RL (see Figure 26.6)
      */
-    private void balanceRL(TreeNode<E> A, TreeNode<E> parentOfA) {
+    private void balanceRL(TreeNode<E> A) {
         TreeNode<E> B = A.right; // A is right-heavy
         TreeNode<E> C = B.left; // B is left-heavy
 
-        if (A == root) {
-            root = C;
-        } else {
-            if (parentOfA.left == A) {
-                parentOfA.left = C;
-            } else {
-                parentOfA.right = C;
-            }
-        }
+        rotateOfTriade(A, C);
 
         A.right = C.left; // Make T2 the right subtree of A
+        if (A.right != null)
+            A.right.parent = A;
         B.left = C.right; // Make T3 the left subtree of B
+        if (B.left != null)
+            B.left.parent = B;
         C.left = A;
+        A.parent = C;
         C.right = B;
+        B.parent = C;
         // Adjust heights
         updateHeight((AVLTreeNode<E>) A);
         updateHeight((AVLTreeNode<E>) B);
@@ -199,17 +212,14 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
         if (root == null)
             return false; // Element is not in the tree
 
-        // Locate the node to be deleted and also locate its parent node
-        TreeNode<E> parent = null;
+        // Locate the node to be deleted
         TreeNode<E> current = root;
         while (current != null) {
-            if (element.compareTo(current.element) < 0) {
-                parent = current;
+            if (element.compareTo(current.element) < 0)
                 current = current.left;
-            } else if (element.compareTo(current.element) > 0) {
-                parent = current;
+            else if (element.compareTo(current.element) > 0)
                 current = current.right;
-            } else
+            else
                 break; // Element is in the tree pointed by current
         }
 
@@ -219,39 +229,43 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
         // Case 1: current has no left children (see Figure 25.10)
         if (current.left == null) {
             // Connect the parent with the right child of the current node
-            if (parent == null) {
+            if (current.parent == null) {
                 root = current.right;
+                if (root != null)
+                    root.parent = null;
             } else {
-                if (element.compareTo(parent.element) < 0)
-                    parent.left = current.right;
+                if (element.compareTo(current.parent.element) < 0)
+                    current.parent.left = current.right;
                 else
-                    parent.right = current.right;
-
+                    current.parent.right = current.right;
+                if (current.right != null)
+                    current.right.parent = current.parent;
                 // Balance the tree if necessary
-                balancePath(parent.element);
+                balancePath(current.parent.element);
             }
         } else {
             // Case 2: The current node has a left child
             // Locate the rightmost node in the left subtree of
             // the current node and also its parent
-            TreeNode<E> parentOfRightMost = current;
             TreeNode<E> rightMost = current.left;
 
             while (rightMost.right != null) {
-                parentOfRightMost = rightMost;
                 rightMost = rightMost.right; // Keep going to the right
             }// Replace the element in current by the element in rightMost
             current.element = rightMost.element;
 
             // Eliminate rightmost node
-            if (parentOfRightMost.right == rightMost)
-                parentOfRightMost.right = rightMost.left;
-            else
+            if (rightMost.parent.right == rightMost) {
+                rightMost.parent.right = rightMost.left;
+            } else {
                 // Special case: parentOfRightMost is current
-                parentOfRightMost.left = rightMost.left;
+                rightMost.parent.left = rightMost.left;
+            }
+            if (rightMost.left != null)
+                rightMost.left.parent = rightMost.parent;
 
             // Balance the tree if necessary
-            balancePath(parentOfRightMost.element);
+            balancePath(rightMost.parent.element);
         }
 
         size--;
