@@ -8,9 +8,9 @@ import javafx.scene.text.Text;
 
 public class BTView extends Pane {
     private final double vGap = 50; // Gap between two levels in a tree
-    private final BST<Integer> tree;
+    private final AVLTree<Integer> tree;
 
-    public BTView(BST<Integer> tree) {
+    public BTView(AVLTree<Integer> tree) {
         this.tree = tree;
         setStatus("Tree is empty");
     }
@@ -23,7 +23,7 @@ public class BTView extends Pane {
         this.getChildren().clear(); // Clear the pane
         if (tree.getRoot() != null) {
             // Display tree recursively
-            displayTree(tree.getRoot(), getWidth() / 2, vGap,
+            displayTree((AVLTree.AVLTreeNode<Integer>) tree.getRoot(), getWidth() / 2, vGap,
                     getWidth() / 4);
         }
     }
@@ -31,30 +31,43 @@ public class BTView extends Pane {
     /**
      * Display a subtree rooted at position (x, y)
      */
-    private void displayTree(BST.TreeNode<Integer> root,
+    private void displayTree(AVLTree.AVLTreeNode<Integer> root,
                              double x, double y, double hGap) {
         if (root.left != null) {
             // Draw a line to the left node
             getChildren().add(new Line(x - hGap, y + vGap, x, y));
             // Draw the left subtree recursively
-            displayTree(root.left, x - hGap, y + vGap, hGap / 2);
+            displayTree((AVLTree.AVLTreeNode<Integer>) root.left, x - hGap, y + vGap, hGap / 2);
         }
 
         if (root.right != null) {
             // Draw a line to the right node
             getChildren().add(new Line(x + hGap, y + vGap, x, y));
             // Draw the right subtree recursively
-            displayTree(root.right, x + hGap, y + vGap, hGap / 2);
+            displayTree((AVLTree.AVLTreeNode<Integer>) root.right, x + hGap, y + vGap, hGap / 2);
         }
 
         // Display a node
         // Tree node radius
-        double radius = 15;
+        final double radius = 15;
         Circle circle = new Circle(x, y, radius);
         circle.setFill(Color.WHITE);
         circle.setStroke(Color.BLACK);
         getChildren().addAll(circle,
-                new Text(x - 4, y + 4, root.element + ""));
+                new Text(x - 4, y + 4, root.element + ""), new Text(x + 20, y + 4, balanceFactor(root) + ""));
+    }
+
+    /**
+     * Return the balance factor of the node
+     */
+    private int balanceFactor(AVLTree.AVLTreeNode<Integer> node) {
+        if (node.right == null) // node has no right subtree
+            return -node.height;
+        else if (node.left == null) // node has no left subtree
+            return +node.height;
+        else
+            return ((AVLTree.AVLTreeNode<Integer>) node.right).height -
+                    ((AVLTree.AVLTreeNode<Integer>) node.left).height;
     }
 }
 

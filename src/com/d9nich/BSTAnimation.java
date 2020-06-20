@@ -1,7 +1,6 @@
 package com.d9nich;
 
 import com.d9nich.AVL.AVLTree;
-import com.d9nich.AVL.BST;
 import com.d9nich.AVL.BTView;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -21,7 +20,7 @@ public class BSTAnimation extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        BST<Integer> tree = new AVLTree<>();
+        AVLTree<Integer> tree = new AVLTree<>();
 
         BorderPane pane = new BorderPane();
         BTView view = new BTView(tree); // Create a View
