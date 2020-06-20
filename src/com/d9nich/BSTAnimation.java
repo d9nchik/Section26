@@ -33,17 +33,17 @@ public class BSTAnimation extends Application {
         tfKey.setAlignment(Pos.BASELINE_RIGHT);
         Button btInsert = new Button("Insert");
         Button btDelete = new Button("Delete");
+        Button btSearch = new Button("Search");
         HBox hBox = new HBox(5);
-        hBox.getChildren().addAll(new Label("Enter a key: "), tfKey, btInsert, btDelete);
+        hBox.getChildren().addAll(new Label("Enter a key: "), tfKey, btInsert, btDelete, btSearch);
         hBox.setAlignment(Pos.CENTER);
         pane.setBottom(hBox);
 
         btInsert.setOnAction(e -> {
             final int key = Integer.parseInt(tfKey.getText());
-            if (tree.search(key)) { // key is in the tree already
-                view.displayTree();
+            if (tree.search(key)) // key is in the tree already
                 view.setStatus(key + " is already in the tree");
-            } else {
+            else {
                 tree.insert(key); // Insert a new key
                 view.displayTree();
                 view.setStatus(key + " is inserted in the tree");
@@ -52,14 +52,18 @@ public class BSTAnimation extends Application {
 
         btDelete.setOnAction(e -> {
             final int key = Integer.parseInt(tfKey.getText());
-            if (!tree.search(key)) { // key is not in the tree
-                view.displayTree();
+            if (!tree.search(key)) // key is not in the tree
                 view.setStatus(key + " is not in the tree");
-            } else {
+            else {
                 tree.delete(key); // Delete a key
                 view.displayTree();
                 view.setStatus(key + " is deleted from the tree");
             }
+        });
+
+        btSearch.setOnAction(e -> {
+            final int key = Integer.parseInt(tfKey.getText());
+            view.setStatus(key + " is " + (tree.search(key) ? "" : "not ") + " in the tree");
         });
 
         // Create a scene and place the pane in the stage

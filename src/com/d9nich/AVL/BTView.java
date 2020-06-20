@@ -8,15 +8,17 @@ import javafx.scene.text.Text;
 
 public class BTView extends Pane {
     private final double vGap = 50; // Gap between two levels in a tree
+    private final Text STATUS = new Text(20, 20, "");
     private final AVLTree<Integer> tree;
 
     public BTView(AVLTree<Integer> tree) {
+        getChildren().add(STATUS);
         this.tree = tree;
         setStatus("Tree is empty");
     }
 
     public void setStatus(String msg) {
-        getChildren().add(new Text(20, 20, msg));
+        STATUS.setText(msg);
     }
 
     public void displayTree() {
@@ -26,6 +28,7 @@ public class BTView extends Pane {
             displayTree((AVLTree.AVLTreeNode<Integer>) tree.getRoot(), getWidth() / 2, vGap,
                     getWidth() / 4);
         }
+        getChildren().add(STATUS);
     }
 
     /**
