@@ -3,6 +3,8 @@ package com.d9nich;
 import com.d9nich.AVL.AVLTree;
 import com.d9nich.AVL.BTView;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,39 +30,44 @@ public class BSTAnimation extends Application {
 
         TextField tfKey = new TextField();
         tfKey.setPrefColumnCount(3);
-        TextField tfValue = new TextField();
-        tfValue.setPrefColumnCount(5);
         tfKey.setAlignment(Pos.BASELINE_RIGHT);
         Button btInsert = new Button("Insert");
         Button btDelete = new Button("Delete");
+        Button btSearch = new Button("Search");
         HBox hBox = new HBox(5);
-        hBox.getChildren().addAll(new Label("Enter a key: "), tfKey, btInsert, btDelete);
+        hBox.getChildren().addAll(new Label("Enter a key: "), tfKey, btInsert, btDelete, btSearch);
         hBox.setAlignment(Pos.CENTER);
         pane.setBottom(hBox);
 
-        btInsert.setOnAction(e -> {
+        final EventHandler<ActionEvent> INSERT_ACTION = e -> {
             final int key = Integer.parseInt(tfKey.getText());
-            if (tree.search(key)) { // key is in the tree already
-                view.displayTree();
+            if (tree.search(key)) // key is in the tree already
                 view.setStatus(key + " is already in the tree");
-            } else {
+            else {
                 tree.insert(key); // Insert a new key
                 view.displayTree();
                 view.setStatus(key + " is inserted in the tree");
             }
-        });
+        };
+        btInsert.setOnAction(INSERT_ACTION);
 
         btDelete.setOnAction(e -> {
             final int key = Integer.parseInt(tfKey.getText());
-            if (!tree.search(key)) { // key is not in the tree
-                view.displayTree();
+            if (!tree.search(key)) // key is not in the tree
                 view.setStatus(key + " is not in the tree");
-            } else {
+            else {
                 tree.delete(key); // Delete a key
                 view.displayTree();
                 view.setStatus(key + " is deleted from the tree");
             }
         });
+
+        btSearch.setOnAction(e -> {
+            final int key = Integer.parseInt(tfKey.getText());
+            view.setStatus(key + " is " + (tree.search(key) ? "" : "not ") + " in the tree");
+        });
+
+        tfKey.setOnAction(INSERT_ACTION);
 
         // Create a scene and place the pane in the stage
         Scene scene = new Scene(pane, 500, 250);

@@ -6,7 +6,7 @@ import com.d9nich.AVL.Tree;
 
 import java.util.Random;
 
-public class BSTTest {
+public class TreeTest {
     public static void main(String[] args) {
         System.out.println("Binary tree:");
         test(new BST<>(), generateArray());
