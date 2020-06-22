@@ -34,16 +34,45 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
      * Update the height of a specified node
      */
     private void updateHeight(AVLTreeNode<E> node) {
-        if (node.left == null && node.right == null) // node is a leaf
+        if (node.left == null && node.right == null) { // node is a leaf
             node.height = 0;
-        else if (node.left == null) // node has no left subtree
-            node.height = 1 + ((AVLTreeNode<E>) (node.right)).height;
-        else if (node.right == null) // node has no right subtree
-            node.height = 1 + ((AVLTreeNode<E>) (node.left)).height;
-        else
+            node.size = 1;
+        } else if (node.left == null) { // node has no left subtree
+            final AVLTreeNode<E> right = (AVLTreeNode<E>) node.right;
+            node.height = 1 + right.height;
+            node.size = 1 + right.size;
+        } else if (node.right == null) { // node has no right subtree
+            final AVLTreeNode<E> left = (AVLTreeNode<E>) (node.left);
+            node.height = 1 + left.height;
+            node.size = 1 + left.size;
+        } else {
+            final AVLTreeNode<E> right = (AVLTreeNode<E>) (node.right);
+            final AVLTreeNode<E> left = (AVLTreeNode<E>) (node.left);
             node.height = 1 +
-                    Math.max(((AVLTreeNode<E>) (node.right)).height,
-                            ((AVLTreeNode<E>) (node.left)).height);
+                    Math.max(right.height,
+                            left.height);
+            node.size = 1 + right.size + left.size;
+        }
+    }
+
+    public E find(int k) {
+        if (k < 0 && k > size)
+            return null;
+        return find(k, (AVLTreeNode<E>) root);
+    }
+
+    private E find(int k, AVLTreeNode<E> root) {
+        if (root.left == null && k == 1)
+            return root.element;
+        if (root.left == null && k == 2)
+            return root.right.element;
+        AVLTreeNode<E> A = (AVLTreeNode<E>) root.left;
+        if (k <= A.size)
+            return find(k, A);
+        if (k == A.size + 1)
+            return root.element;
+        AVLTreeNode<E> B = (AVLTreeNode<E>) root.right;
+        return find(k - A.size - 1, B);
     }
 
     /**
@@ -277,6 +306,7 @@ public class AVLTree<E extends Comparable<E>> extends BST<E> {
      */
     protected static class AVLTreeNode<E> extends TreeNode<E> {
         protected int height = 0; // New data field
+        protected int size = 1;
 
         public AVLTreeNode(E e) {
             super(e);
