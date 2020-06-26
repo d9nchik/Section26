@@ -1,5 +1,7 @@
 package com.d9nich.AVL;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -67,5 +69,15 @@ class AVLTreeTest {
 
         avlTree.remove(-1);
         assertThrows(NullPointerException.class, () -> avlTree.remove(null));
+    }
+
+    @Test
+    void find() {
+        AVLTree<Integer> avlTree = new AVLTree<>();
+        avlTree.addAll(Arrays.asList(25, 10, 34, 5, 20, 30, 50));
+        assertEquals(10, avlTree.find(2));
+        assertEquals(5, avlTree.find(1));
+        assertThrows(NullPointerException.class, () -> avlTree.find(-1));
+        assertThrows(NullPointerException.class, () -> avlTree.find(10));
     }
 }
